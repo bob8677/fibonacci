@@ -115,7 +115,66 @@ struct Pertag {
 	unsigned int sellts[LENGTH(tags) + 1]; /* selected layouts */
 	const Layout *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
 	int showbars[LENGTH(tags) + 1]; /* display bar for the current tag */
+	int innergaps[LENGTH(tags) + 1];
+	int outergaps[LENGTH(tags) + 1];
+	int enablegaps[LENGTH(tags) + 1];
 };
+
+void changeigap(const Arg *arg){
+	setgaps(
+		selmon->pertag->innergaps[selmon->pertag->curtag] + arg->i,
+		selmon->pertag->outergaps[selmon->pertag->curtag]
+	);
+}
+
+void changeogap(const Arg *arg){
+	setgaps(
+		selmon->pertag->innergaps[selmon->pertag->curtag],
+		selmon->pertag->outergaps[selmon->pertag->curtag] + arg->i
+	);
+}
+void
+togglegaps(const Arg *arg){
+	selmon->pertag->enablegaps[selmon->pertag->curtag] = !selmon->pertag->enablegaps[selmon->pertag->curtag];
+	arrange(selmon);
+}
+
+void defaultgaps(const Arg *arg){
+	setgaps(
+		selmon->innergap,
+		selmon->outergap
+	);
+}
+
+void setgaps(int i , int o){
+	if (o < 0) o = 0;
+	if (i < 0) i = 0;
+
+	selmon->pertag->innergaps[selmon->pertag->curtag] = i;
+	selmon->pertag->outergaps[selmon->pertag->curtag] = o;
+
+	arrange(selmon);
+}
+
+void getgaps(Monitor *m, int *i, int *ov, int *oh, unsigned int *nc) {
+	unsigned int n, e;
+	e = selmon->pertag->enablegaps[selmon->pertag->curtag];
+
+	Client *c;
+	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+	if (smartgaps && n == 1) {
+		e = 0; // outer gaps disabled when only one client
+	}
+
+	if (smartgaps && m->lt[selmon->sellt]->arrange == &monocle) {
+		e = 0;
+	}
+
+	*i  = m->pertag->innergaps[m->pertag->curtag] * e;
+	*ov = m->pertag->outergaps[m->pertag->curtag] * e;
+	*oh = m->pertag->outergaps[m->pertag->curtag] * e * m->mw / m->mh;
+	*nc = n;
+}
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
@@ -1254,6 +1313,9 @@ createmon(void)
 	m->nmaster = nmaster;
 	m->showbar = showbar;
 	m->topbar = topbar;
+	m->innergap = innergap;
+	m->outergap = outergap;
+	m->enablegaps = enablegaps;
 	m->clientcount = 0;
     m->overlaymode = 0;
 	m->scratchvisible = 0;
@@ -1272,6 +1334,9 @@ createmon(void)
 		m->pertag->sellts[i] = m->sellt;
 
 		m->pertag->showbars[i] = m->showbar;
+		m->pertag->innergaps[i] = m->innergap;
+		m->pertag->outergaps[i] = m->outergap;
+		m->pertag->enablegaps[i] = m->enablegaps;
 	}
 
 	return m;
