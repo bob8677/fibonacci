@@ -115,7 +115,61 @@ struct Pertag {
 	unsigned int sellts[LENGTH(tags) + 1]; /* selected layouts */
 	const Layout *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
 	int showbars[LENGTH(tags) + 1]; /* display bar for the current tag */
+	int innergaps[LENGTH(tags) + 1];
+	int outergaps[LENGTH(tags) + 1];
+	int enablegaps[LENGTH(tags) + 1];
+	int smartgaps[LENGTH(tags) + 1];
 };
+
+void changeigap(const Arg *arg){
+	setgaps(
+		selmon->innergap + arg->i,
+		selmon->outergap
+	);
+}
+
+void changeogap(const Arg *arg){
+	setgaps(
+		selmon->innergap,
+		selmon->outergap + arg->i
+	);
+}
+void
+togglegaps(const Arg *arg){
+	selmon->pertag->enablegaps[selmon->pertag->curtag] = !selmon->pertag->enablegaps[selmon->pertag->curtag];
+	selmon->enablegap = selmon->pertag->enablegaps[selmon->pertag->curtag];
+	arrange(selmon);
+}
+
+void
+togglesmartgaps(const Arg *arg){
+	selmon->pertag->smartgaps[selmon->pertag->curtag] = !selmon->pertag->smartgaps[selmon->pertag->curtag];
+	selmon->smartgap = selmon->pertag->smartgaps[selmon->pertag->curtag];
+	arrange(selmon);
+}
+
+void defaultgaps(const Arg *arg){
+	setgaps(
+		innergap,
+		outergap
+	);
+}
+
+void setgaps(int i , int o){
+	if (o < 0) o = 0;
+	if (i < 0) i = 0;
+
+	selmon->pertag->innergaps[selmon->pertag->curtag] = i;
+	selmon->pertag->outergaps[selmon->pertag->curtag] = o;
+
+	selmon->innergap = selmon->pertag->innergaps[selmon->pertag->curtag];
+	selmon->outergap = selmon->pertag->outergaps[selmon->pertag->curtag];
+
+	int tempanim = animated;
+	animated = 0;
+	arrange(selmon);
+	animated = tempanim;
+}
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
@@ -1254,6 +1308,10 @@ createmon(void)
 	m->nmaster = nmaster;
 	m->showbar = showbar;
 	m->topbar = topbar;
+	m->innergap = innergap;
+	m->outergap = outergap;
+	m->enablegap = enablegap;
+	m->smartgap = smartgap;
 	m->clientcount = 0;
     m->overlaymode = 0;
 	m->scratchvisible = 0;
@@ -1272,6 +1330,10 @@ createmon(void)
 		m->pertag->sellts[i] = m->sellt;
 
 		m->pertag->showbars[i] = m->showbar;
+		m->pertag->innergaps[i] = m->innergap;
+		m->pertag->outergaps[i] = m->outergap;
+		m->pertag->enablegaps[i] = m->enablegap;
+		m->pertag->smartgaps[i] = m->smartgap;
 	}
 
 	return m;
@@ -5155,6 +5217,10 @@ toggleview(const Arg *arg)
 		selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
 		selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 		selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+		selmon->enablegap = selmon->pertag->enablegaps[selmon->pertag->curtag];
+		selmon->smartgap = selmon->pertag->smartgaps[selmon->pertag->curtag];
+		selmon->outergap = selmon->pertag->outergaps[selmon->pertag->curtag];
+		selmon->innergap = selmon->pertag->innergaps[selmon->pertag->curtag];
 
 		if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
 			togglebar(NULL);
@@ -5696,6 +5762,10 @@ view(const Arg *arg)
 	selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
 	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 	selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+	selmon->enablegap = selmon->pertag->enablegaps[selmon->pertag->curtag];
+	selmon->smartgap = selmon->pertag->smartgaps[selmon->pertag->curtag];
+	selmon->outergap = selmon->pertag->outergaps[selmon->pertag->curtag];
+	selmon->innergap = selmon->pertag->innergaps[selmon->pertag->curtag];
 
 	if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
 		togglebar(NULL);
@@ -5796,6 +5866,10 @@ viewtoleft(const Arg *arg) {
 		selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
 		selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 		selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+		selmon->enablegap = selmon->pertag->enablegaps[selmon->pertag->curtag];
+		selmon->smartgap = selmon->pertag->smartgaps[selmon->pertag->curtag];
+		selmon->outergap = selmon->pertag->outergaps[selmon->pertag->curtag];
+		selmon->innergap = selmon->pertag->innergaps[selmon->pertag->curtag];
 
 		if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
 			togglebar(NULL);
@@ -5927,10 +6001,18 @@ viewtoright(const Arg *arg) {
 		selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
 		selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 		selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+		selmon->enablegap = selmon->pertag->enablegaps[selmon->pertag->curtag];
+		selmon->smartgap = selmon->pertag->smartgaps[selmon->pertag->curtag];
+		selmon->outergap = selmon->pertag->outergaps[selmon->pertag->curtag];
+		selmon->innergap = selmon->pertag->innergaps[selmon->pertag->curtag];
 
 		if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
 			togglebar(NULL);
 
+		selmon->outergap = selmon->pertag->outergaps[selmon->pertag->curtag];
+		selmon->outergap = selmon->pertag->outergaps[selmon->pertag->curtag];
+		selmon->outergap = selmon->pertag->outergaps[selmon->pertag->curtag];
+		selmon->outergap = selmon->pertag->outergaps[selmon->pertag->curtag];
 
 		focus(NULL);
 		arrange(selmon);

@@ -1,9 +1,14 @@
 /* See LICENSE file for copyright and license details. */
+#include <X11/X.h>
 #include <X11/XF86keysym.h>
 
 /* appearance */
 static const unsigned int borderpx = 3;		  /* border pixel of windows */
 static const unsigned int snap = 32;		  /* snap pixel */
+static const unsigned int outergap = 20;
+static const unsigned int innergap = 10;
+static const unsigned int enablegap = 1;
+static int smartgap = 0;
 static const unsigned int startmenusize = 30;		  /* snap pixel */
 static const unsigned int systraypinning = 0; /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
 static const unsigned int systrayspacing = 0; /* systray spacing */
@@ -288,6 +293,13 @@ static Key dkeys[] = {
 };
 
 static Key keys[] = {
+	{MODKEY,                                XK_bracketright,    changeogap,           {.i = +1}},
+	{MODKEY,                                XK_bracketleft,     changeogap,           {.i = -1}},
+	{MODKEY|ShiftMask,                      XK_bracketright,    changeigap,           {.i = +1}},
+	{MODKEY|ShiftMask,                      XK_bracketleft,     changeigap,           {.i = -1}},
+	{MODKEY,                                XK_backslash,       togglegaps,           {0}},
+	{MODKEY|ShiftMask,                      XK_backslash,       defaultgaps,          {0}},
+	{MODKEY|ControlMask,                    XK_backslash,       togglesmartgaps,      {0}},
 	/* modifier                             key                 function              argument */
 
 	{MODKEY|ControlMask,                    XK_Up,              spawn,                {.v = notificationclose}},
