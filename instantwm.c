@@ -122,17 +122,23 @@ struct Pertag {
 };
 
 void changeigap(const Arg *arg){
+	int tempanim = animated;
+	animated = 0;
 	setgaps(
 		selmon->innergap + arg->i,
 		selmon->outergap
 	);
+	animated = tempanim;
 }
 
 void changeogap(const Arg *arg){
+	int tempanim = animated;
+	animated = 0;
 	setgaps(
 		selmon->innergap,
 		selmon->outergap + arg->i
 	);
+	animated = tempanim;
 }
 void
 togglegaps(const Arg *arg){
@@ -165,10 +171,7 @@ void setgaps(int i , int o){
 	selmon->innergap = selmon->pertag->innergaps[selmon->pertag->curtag];
 	selmon->outergap = selmon->pertag->outergaps[selmon->pertag->curtag];
 
-	int tempanim = animated;
-	animated = 0;
 	arrange(selmon);
-	animated = tempanim;
 }
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
@@ -3632,8 +3635,8 @@ resizeclient(Client *c, int x, int y, int w, int h)
 	wc.border_width = c->bw;
 
 	if ((!c->isfullscreen && !c->isfloating) &&
-	((nexttiled(c->mon->clients) == c && !nexttiled(c->next) && NULL != c->mon->lt[c->mon->sellt]->arrange) ||
-	&monocle == c->mon->lt[c->mon->sellt]->arrange)) {
+	((nexttiled(c->mon->clients) == c && !nexttiled(c->next) && !(c->mon->outergap * c->mon->enablegap * !c->mon->smartgap) && NULL != c->mon->lt[c->mon->sellt]->arrange) ||
+	&monocle == c->mon->lt[c->mon->sellt]->arrange) && !(c->mon->outergap * c->mon->enablegap * !c->mon->smartgap)) {
 		c->w = wc.width += c->bw * 2;
 		c->h = wc.height += c->bw * 2;
 		wc.border_width = 0;
@@ -5033,15 +5036,9 @@ togglefloating(const Arg *arg)
 	if (selmon->sel->isfloating) {
 		/* restore last known float dimensions */
 		XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColFloat].pixel);
-        if (selmon->sel->bw == 0)
-            selmon->sel->bw = selmon->sel->oldbw;
-		animateclient(selmon->sel, selmon->sel->sfx, selmon->sel->sfy,
+	animateclient(selmon->sel, selmon->sel->sfx, selmon->sel->sfy,
 		       selmon->sel->sfw, selmon->sel->sfh, 7, 0);
 	} else {
-        if (clientcount() == 1 && !selmon->sel->snapstatus) {
-            savebw(selmon->sel);
-            selmon->sel->bw = 0;
-        }
 		XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColBorder].pixel);
 		/* save last known float dimensions */
 		selmon->sel->sfx = selmon->sel->x;
