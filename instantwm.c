@@ -4538,6 +4538,7 @@ tagmon(const Arg *arg)
 
     if (selmon->sel->isfloating) {
         Client *c;
+        Monitor *m;
         float xfact, yfact;
         c = selmon->sel;
         xfact = (float)(c->x - selmon->mx) / selmon->ww;
