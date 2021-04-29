@@ -5010,9 +5010,15 @@ togglefloating(const Arg *arg)
 		XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColFloat].pixel);
         if (selmon->sel->bw == 0)
             selmon->sel->bw = selmon->sel->oldbw;
+        if (selmon->sel->bw == 0)
+            selmon->sel->bw = selmon->sel->oldbw;
 		animateclient(selmon->sel, selmon->sel->sfx, selmon->sel->sfy,
-		       selmon->sel->sfw, selmon->sel->sfh, 7, 0);
-	} else {
+ 		       selmon->sel->sfw, selmon->sel->sfh, 7, 0);
+ 	} else {
+        if (clientcount() == 1 && !selmon->sel->snapstatus) {
+            savebw(selmon->sel);
+            selmon->sel->bw = 0;
+        }
         if (clientcount() == 1 && !selmon->sel->snapstatus) {
             savebw(selmon->sel);
             selmon->sel->bw = 0;
