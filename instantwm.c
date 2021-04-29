@@ -5009,8 +5009,6 @@ togglefloating(const Arg *arg)
 	if (selmon->sel->isfloating) {
 		/* restore last known float dimensions */
 		XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColFloat].pixel);
-        if (selmon->sel->bw == 0)
-            selmon->sel->bw = selmon->sel->oldbw;
 		animateclient(selmon->sel, selmon->sel->sfx, selmon->sel->sfy,
  		       selmon->sel->sfw, selmon->sel->sfh, 7, 0);
  	} else {
