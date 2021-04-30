@@ -122,17 +122,23 @@ struct Pertag {
 };
 
 void changeigap(const Arg *arg){
+	int tmpanimated = animated;
+	animated = 0;
 	setgaps(
 		selmon->innergap + arg->i,
 		selmon->outergap
 	);
+	animated = tmpanimated;
 }
 
 void changeogap(const Arg *arg){
+	int tmpanimated = animated;
+	animated = 0;
 	setgaps(
 		selmon->innergap,
 		selmon->outergap + arg->i
 	);
+	animated = tmpanimated;
 }
 void
 togglegaps(const Arg *arg){
