@@ -29,24 +29,22 @@ bstack(Monitor *m) {
 	rx = m->wx + OUTERGAP*m->mw/m->mh;
 
 	if (n > m->nmaster) {
-		mh = m->nmaster ? m->mfact * rh : 0;
-		tw = rw / (n - m->nmaster);
+		mh = m->nmaster ? m->mfact * rh - INNERGAP / 2 : 0;
 		ty = ry + mh;
 	} else {
 		mh = rh;
-		tw = rw;
 		ty = ry;
 	}
-	for (i = mx = 0, tx = rx, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++) {
+	for (i = mx = tx = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++) {
 		if (i < m->nmaster) {
-			w = (rw - mx) / (MIN(n, m->nmaster) - i);
+			w = (rw - mx + INNERGAP) / (MIN(n, m->nmaster) - i) - INNERGAP;
 			animateclient(c, rx + mx, ry, w - (2 * c->bw), mh - (2 * c->bw), framecount, 0);
-			mx += WIDTH(c);
+			mx += WIDTH(c) + INNERGAP;
 		} else {
 			h = rh - mh;
-			animateclient(c, tx, ty, tw - (2 * c->bw), h - (2 * c->bw), framecount, 0);
-			if (tw != rw)
-				tx += WIDTH(c);
+			tw = (rw - tx + INNERGAP) / (n - i) - INNERGAP;
+			animateclient(c, tx + rx, ty + INNERGAP * (m->nmaster != 0), tw - (2 * c->bw), h - (2 * c->bw) - INNERGAP * (m->nmaster != 0), framecount, 0);
+			tx += WIDTH(c) + INNERGAP;
 		}
 	}
 }
@@ -109,22 +107,20 @@ bstackhoriz(Monitor *m) {
 	rx = m->wx + OUTERGAP*m->mw/m->mh;
 
 	if (n > m->nmaster) {
-		mh = m->nmaster ? m->mfact * rh : 0;
-		th = (rh - mh) / (n - m->nmaster);
-		ty = ry + mh;
+		mh = m->nmaster ? m->mfact * rh - INNERGAP / 2 : 0;
+		ty = mh + INNERGAP * (m->nmaster != 0);
 	} else {
 		th = mh = rh;
-		ty = ry;
 	}
 	for (i = mx = 0, tx = rx, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++) {
 		if (i < m->nmaster) {
-			w = (rw - mx) / (MIN(n, m->nmaster) - i);
+			w = (rw - mx + INNERGAP) / (MIN(n, m->nmaster) - i) - INNERGAP;
 			animateclient(c, rx + mx, ry, w - (2 * c->bw), mh - (2 * c->bw), framecount, 0);
-			mx += WIDTH(c);
+			mx += WIDTH(c) + INNERGAP;
 		} else {
-		animateclient(c, tx, ty, rw - (2 * c->bw), th - (2 * c->bw), framecount, 0);
-			if (th != rh)
-				ty += HEIGHT(c);
+			th = (rh - ty + INNERGAP) / (n - i) - INNERGAP;
+			animateclient(c, tx, ty + ry, rw - (2 * c->bw), th - (2 * c->bw), framecount, 0);
+			ty += HEIGHT(c) + INNERGAP;
 		}
 	}
 }
