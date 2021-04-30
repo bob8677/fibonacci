@@ -146,17 +146,17 @@ deck(Monitor *m)
 	rx = m->wx + OUTERGAP*m->mw/m->mh;
 
 	if(n > m->nmaster)
-		mw = m->nmaster ? rw * m->mfact : 0;
+		mw = m->nmaster ? rw * m->mfact - INNERGAP / 2 : 0;
 	else
 		mw = rw;
 	for(i = my = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
 		if(i < m->nmaster) {
-			h = (rh - my) / (MIN(n, m->nmaster) - i);
+			h = (rh - my + INNERGAP) / (MIN(n, m->nmaster) - i) - INNERGAP;
 			resize(c, rx, ry + my, mw - (2*c->bw), h - (2*c->bw), False);
-			my += HEIGHT(c);
+			my += HEIGHT(c) + INNERGAP;
 		}
 		else
-			resize(c, rx + mw, ry, rw - mw - (2*c->bw), rh - (2*c->bw), False);
+			resize(c, rx + mw + INNERGAP * (m->nmaster != 0), ry, rw - mw - (2*c->bw) - INNERGAP * (m->nmaster != 0), rh - (2*c->bw), False);
 }
 
 void
@@ -186,14 +186,14 @@ grid(Monitor *m) {
 	cols = (rows && (rows - 1) * rows >= n) ? rows - 1 : rows;
 
 	/* window geoms (cell height/width) */
-	int ch = rh / (rows ? rows : 1);
-	int cw = rw / (cols ? cols : 1);
+	int ch = rh / (rows ? rows : 1) - INNERGAP * (rows - 1) / (rows ? rows : 1);
+	int cw = rw / (cols ? cols : 1) - INNERGAP * (cols - 1) / (cols ? cols : 1);;
 	for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next)) {
-		unsigned int cx = rx + (i / rows) * cw;
-		unsigned int cy = ry + (i % rows) * ch;
+		unsigned int cx = rx + (i / rows) * (cw + INNERGAP);
+		unsigned int cy = ry + (i % rows) * (ch + INNERGAP);
 		/* adjust height/width of last row/column's windows */
-		int ah = ((i + 1) % rows == 0) ? rh - ch * rows : 0;
-		unsigned int aw = (i >= rows * (cols - 1)) ? rw - cw * cols : 0;
+		int ah = ((i + 1) % rows == 0) ? rh - ch * rows - INNERGAP * (rows - 1) : 0;
+		unsigned int aw = (i >= rows * (cols - 1)) ? rw - cw * cols - INNERGAP * (cols - 1) : 0;
 		animateclient(c, cx, cy, cw - 2 * c->bw + aw, ch - 2 * c->bw + ah, framecount, 0);
 		i++;
 	}
