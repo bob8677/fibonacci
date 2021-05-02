@@ -120,9 +120,6 @@ struct NumTags {
   char limitexceeded[LENGTH(tags) > 31 ? -1 : 1];
 };
 
-
-
-
 void keyrelease(XEvent *e) {}
 
 int overlayexists() {
