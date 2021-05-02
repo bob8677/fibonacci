@@ -24,6 +24,8 @@ static char xresourcesfont[30];
 // empty background
 static char col_background[] = "#292f3a"; /* top bar dark background*/
 // fonts
+//
+//
 static char col_white[] = "#ffffff"; /*white for fonts*/
 static char col_gray[] = "#747c90";  /*top bar minimized foreground*/
 
@@ -61,6 +63,9 @@ static char col_hover_dark_red[] =
 static char col_hover[] = "#596377";        /*focused instantmenu or topbar d */
 static char col_hover_shadow[] = "#475166"; /*focused instantmenu or topbar d */
 
+
+
+
 static const char *colors[][4] = {
     /*                    fg               bg              border float*/
     [SchemeNorm] = {col_white, col_background, col_pastel_blue, col_green},
@@ -72,7 +77,7 @@ static const char *colors[][4] = {
                          col_dark_orange},
     [SchemeEmpty] = {col_white, col_red, col_light_blue, col_dark_red},
     [SchemeHover] = {col_white, col_hover, col_light_blue, col_hover_shadow},
-    [SchemeClose] = {col_hover_red, col_red, col_hover_dark_red, col_dark_red},
+        [SchemeClose] = {col_hover_red, col_red, col_hover_dark_red, col_dark_red},
     [SchemeHoverTags] = {col_white, col_hover_blue, col_light_blue,
                          col_hover_dark_blue},
 };
@@ -144,7 +149,7 @@ static const Layout layouts[] = {
       {MODKEY | ControlMask, KEY, toggleview, {.ui = 1 << TAG}},               \
       {MODKEY | ShiftMask, KEY, tag, {.ui = 1 << TAG}},                        \
       {MODKEY | Mod1Mask, KEY, followtag, {.ui = 1 << TAG}},                   \
-      {MODKEY | ControlMask | ShiftMask, KEY, toggletag, {.ui = 1 << TAG}},    \
+            {MODKEY | ControlMask | ShiftMask, KEY, toggletag, {.ui = 1 << TAG}},    \
       {MODKEY | Mod1Mask | ShiftMask, KEY, swaptags, {.ui = 1 << TAG}},
 
 #define SHCMD(cmd)                                                             \
@@ -168,9 +173,9 @@ static const char *instantrepeatcmd[] = {"instantrepeat", NULL};
 static const char *instantpacmancmd[] = {"instantpacman", NULL};
 static const char *instantsharecmd[] = {"instantshare", "snap", NULL};
 static const char *nautiluscmd[] = {".config/instantos/default/filemanager",
-                                    NULL};
+                                          NULL};
 static const char *slockcmd[] = {".config/instantos/default/lockscreen", NULL};
-static const char *onekeylock[] = {"ilock", "-o", NULL};
+      static const char *onekeylock[] = {"ilock", "-o", NULL};
 static const char *langswitchcmd[] = {"ilayout", NULL};
 static const char *oslockcmd[] = {"instantlock", "-o", NULL};
 static const char *helpcmd[] = {"instanthotkeys", "gui", NULL};
@@ -194,7 +199,7 @@ static const char *instantswitchcmd[] = {"rofi",
 static const char *caretinstantswitchcmd[] = {
     "rofi",
     "-show",
-    "window",
+          "window",
     "-kb-row-down",
     "Alt+Tab,Down",
     "-kb-row-up",
@@ -218,7 +223,7 @@ static const char *rangercmd[] = {".config/instantos/default/termfilemanager",
 static const char *panther[] = {".config/instantos/default/appmenu", NULL};
 static const char *controlcentercmd[] = {"instantsettings", NULL};
 static const char *displaycmd[] = {"instantdisper", NULL};
-static const char *pavucontrol[] = {"pavucontrol", NULL};
+static       const char *pavucontrol[] = {"pavucontrol", NULL};
 static const char *instantsettings[] = {"instantsettings", NULL};
 // static const char  *clickcmd[] = { "autoclicker", NULL };
 static const char *codecmd[] = {"instantutils open graphicaleditor", NULL};
@@ -254,7 +259,7 @@ ResourcePref resources[] = {
     {"minimize", STRING, &col_orange},
     {"darkminimize", STRING, &col_dark_orange},
     {"minimizedcolor", STRING, &col_gray},
-
+ 
     {"border", STRING, &col_pastel_blue},
     {"activeborder", STRING, &col_light_blue},
 
