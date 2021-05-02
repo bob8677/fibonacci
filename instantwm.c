@@ -5915,6 +5915,7 @@ void winview(const Arg *arg) {
 
   if (!(c = wintoclient(win)))
     return;
+  int i;
 
   a.ui = c->tags;
   if (c->tags == 1 << 20) {
@@ -6001,7 +6002,6 @@ void resource_load(XrmDatabase db, char *name, enum resource_type rtype,
   idst = dst;
   fdst = dst;
 
-            int test;
 
 
                     int tes2t;
