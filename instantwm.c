@@ -6001,6 +6001,12 @@ void resource_load(XrmDatabase db, char *name, enum resource_type rtype,
   idst = dst;
   fdst = dst;
 
+            int test;
+
+
+                    int tes2t;
+
+
   char fullname[256];
   char *type;
   XrmValue ret;
