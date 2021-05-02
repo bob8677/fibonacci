@@ -48,6 +48,7 @@ static int showalttag = 0;
 static int freealttab = 0;
 
 
+
 static Client *lastclient;
 
 static int tagprefix = 0;
