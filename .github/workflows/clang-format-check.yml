@@ -51,11 +51,10 @@ jobs:
         # Default: '--no-rebase'
         pull_strategy: '--no-rebase'
 
-        branch: formated
 
         # Whether to push the commit and, if any, its tags to the repo. It can also be used to set the git push arguments (see the paragraph below for more info)
         # Default: true
-        push: true
+        push: 'origin formated --force'
 
         # The arguments for the `git rm` command (see the paragraph below for more info)
         # Default: ''
