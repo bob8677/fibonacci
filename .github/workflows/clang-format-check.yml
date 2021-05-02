@@ -17,13 +17,6 @@ jobs:
         extensions: 'h,cpp,c'
         clangFormatVersion: 12
         inplace: True
-    - uses: EndBug/add-and-commit@v4
-      with:
-        author_name: Clang Robot
-        author_email: robot@example.com
-        message: 'Committing clang-format changes'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
       with:
         # The arguments for the `git add` command (see the paragraph below for more info)
@@ -43,8 +36,6 @@ jobs:
         # Default: '.'
         cwd: '.'
 
-        branch: formated
-
         # Determines the way the action fills missing author name and email. Three options are available:
         # - github_actor -> UserName <UserName@users.noreply.github.com>
         # - user_info -> Your Display Name <your-actual@email.com>
@@ -62,7 +53,7 @@ jobs:
 
         # Whether to push the commit and, if any, its tags to the repo. It can also be used to set the git push arguments (see the paragraph below for more info)
         # Default: true
-        push: true
+        push: 'origin formated --force'
 
         # The arguments for the `git rm` command (see the paragraph below for more info)
         # Default: ''
