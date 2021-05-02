@@ -296,77 +296,66 @@ overviewlayout(Monitor *m)
 	XSync(dpy, False);
 }
 
-void
-tcl(Monitor * m)
-{
-	int x, y, h, w, mw, sw, bdw;
-	unsigned int i, n;
-	Client * c;
+void tcl (Monitor* m) {
+	unsigned int i, n, h, mw, mx, my, oty, ety, tw, rw, rh, rx, ry, framecount;
+	Client*      c;
 
-	for (n = 0, c = nexttiled(m->clients); c;
-			c = nexttiled(c->next), n++);
+	if (animated && clientcount() > 5)
+		framecount = 3;
+	else
+		framecount = 6;
 
+	/* count number of clients in the selected monitor */
+	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
 	if (n == 0)
 		return;
 
-	c = nexttiled(m->clients);
+	rh = m->wh - 2 * OUTERGAP;
+	rw = m->ww - 2 * OUTERGAP * m->mw / m->mh;
+	ry = m->wy + OUTERGAP;
+	rx = m->wx + OUTERGAP * m->mw / m->mh;
 
-	mw = m->mfact * m->ww;
-	sw = (m->ww - mw) / 2;
-	bdw = (2 * c->bw);
-	resize(c,
-			n < 3 ? m->wx : m->wx + sw,
-			m->wy,
-			n == 1 ? m->ww - bdw : mw - bdw,
-			m->wh - bdw,
-			False);
+	/* initialize areas */
+	mw = rw;
+	mx = 0;
+	my = 0;
+	tw = mw;
 
-	if (--n == 0)
-		return;
+	if (n > m->nmaster) {
+		/* go mfact box in the center if more than nmaster clients */
+		mw = m->nmaster ? rw * m->mfact - INNERGAP / 2 * ((n - m->nmaster > 1) + 1) - INNERGAP % 2 : 0;
+		tw = rw - mw;
 
-	w = (m->ww - mw) / ((n > 1) + 1);
-	c = nexttiled(c->next);
-
-	if (n > 1)
-	{
-		x = m->wx + ((n > 1) ? mw + sw : mw);
-		y = m->wy;
-		h = m->wh / (n / 2);
-
-		if (h < bh)
-			h = m->wh;
-
-		for (i = 0; c && i < n / 2; c = nexttiled(c->next), i++)
-		{
-			resize(c,
-					x,
-					y,
-					w - bdw,
-					(i + 1 == n / 2) ? m->wy + m->wh - y - bdw : h - bdw,
-					False);
-
-			if (h != m->wh)
-				y = c->y + HEIGHT(c);
+		if (n - m->nmaster > 1) {
+			/* only one client */
+			mx = (rw - mw) / 2;
+			tw = (rw - mw) / 2;
 		}
 	}
 
-	x = (n + 1 / 2) == 1 ? mw : m->wx;
-	y = m->wy;
-	h = m->wh / ((n + 1) / 2);
-
-	if (h < bh)
-		h = m->wh;
-
-	int rw = w - bdw;
-
-	for (i = 0; c; c = nexttiled(c->next), i++)
-	{
-		int rh = (i + 1 == (n + 1) / 2) ? m->wy + m->wh - y - bdw : h - bdw;
-		resize(c, x, y, rw,	rh, 0);
-
-		if (h != m->wh)
-			y = c->y + HEIGHT(c);
-	}
+	oty = 0;
+	ety = 0;
+	for (i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+		if (i < m->nmaster) {
+			/* nmaster clients are stacked vertically, in the center
+		 * of the screen */
+			h = (rh - my + INNERGAP) / (MIN(n, m->nmaster) - i) - INNERGAP;
+			animateclient(c, rx + mx, ry + my, mw - (2 * c->bw),
+			              h - (2 * c->bw), framecount, 0);
+			my += HEIGHT(c) + INNERGAP;
+		} else if ((i - m->nmaster) <= (n - m->nmaster - 1) / 2) {
+			// column on the right
+			h = (rh - oty + INNERGAP) / ((n - m->nmaster + 1) / 2 - i + m->nmaster) - INNERGAP;
+			animateclient(c, rx + mx + mw + INNERGAP * (n!=1) / ((!m->nmaster) + 1), ry + oty,
+			              tw - (2 * c->bw) - INNERGAP * (n!=1) / ((!m->nmaster) + 1), h - (2 * c->bw), framecount, 0);
+			oty += HEIGHT(c) + INNERGAP;
+		} else {
+			// column on the right
+			h = (rh - ety + INNERGAP) / (n - i) - INNERGAP;
+			animateclient(c, rx, ry + ety, tw - (2 * c->bw) - INNERGAP / ((!m->nmaster) + 1) - INNERGAP % 2 * (!m->nmaster),
+			              h - (2 * c->bw), framecount, 0);
+			ety += HEIGHT(c) + INNERGAP;
+		}
 }
 
 void
