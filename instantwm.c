@@ -5152,6 +5152,11 @@ void createscratchpad(const Arg *arg) {
 		return;
 	c = selmon->sel;
 
+	if (c->tags == 1 << 20) {
+		tag(&((Arg){.ui = 1 << (selmon->pertag->curtag -1 )}));
+		return;
+	}
+
 	c->tags = 1 << 20;
 	c->issticky = selmon->scratchvisible;
 	if (!c->isfloating)
